@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'config/routes.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'config/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,21 +17,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Port Security System',
-      theme: ThemeData.dark(useMaterial3: true).copyWith(
-        colorScheme: ColorScheme.dark(
-          primary: Colors.blue,
-          secondary: Colors.blueAccent,
-          surface: Colors.grey[900]!,
-        ),
-        cardTheme: CardTheme(
-          color: Colors.grey[850],
-          elevation: 4,
-          margin: const EdgeInsets.all(8),
-        ),
-      ),
-      initialRoute: "/",
+      theme: AppTheme.darkTheme,
       onGenerateRoute: Routes.router.generator,
-      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
     );
   }
 }

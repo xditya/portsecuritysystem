@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:portsecuritysystem/config/theme.dart';
 
 class FaceEntryLogScreen extends StatefulWidget {
   const FaceEntryLogScreen({super.key});
@@ -100,68 +101,99 @@ class _FaceEntryLogScreenState extends State<FaceEntryLogScreen> {
   Widget _buildEntryCard(Map<String, dynamic> entry) {
     final dateTime = _formatDateTime(entry['date'], entry['time']);
     final confidence = entry['confidence'];
+    final status = entry['status'];
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.person, size: 24),
-                const SizedBox(width: 8),
-                Text(
-                  entry['name'],
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                    child:
+                        const Icon(Icons.person, color: AppTheme.primaryColor),
                   ),
-                ),
-                const Spacer(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry['name'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          dateTime,
+                          style: const TextStyle(
+                            color: AppTheme.subtleTextColor,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: status == 'Present'
+                          ? AppTheme.successColor.withOpacity(0.1)
+                          : AppTheme.errorColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        color: status == 'Present'
+                            ? AppTheme.successColor
+                            : AppTheme.errorColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (confidence != null) ...[
+                const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: entry['status'] == 'Present'
-                        ? Colors.green.shade100
-                        : Colors.orange.shade100,
+                    color: AppTheme.secondaryColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    entry['status'],
-                    style: TextStyle(
-                      color: entry['status'] == 'Present'
-                          ? Colors.green.shade700
-                          : Colors.orange.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.verified_user,
+                        size: 16,
+                        color: AppTheme.primaryColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Confidence: $confidence',
+                        style: const TextStyle(
+                          color: AppTheme.subtleTextColor,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            if (confidence != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Confidence: $confidence',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 14,
-                ),
-              ),
             ],
-            const SizedBox(height: 4),
-            Text(
-              dateTime,
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 13,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -192,11 +224,9 @@ class _FaceEntryLogScreenState extends State<FaceEntryLogScreen> {
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search by name...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    hintText: 'Search by name',
+                    prefixIcon: const Icon(Icons.search,
+                        color: AppTheme.subtleTextColor),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear),
@@ -209,38 +239,42 @@ class _FaceEntryLogScreenState extends State<FaceEntryLogScreen> {
                   ),
                   onChanged: (value) => _filterRecords(),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedStatus,
-                        decoration: InputDecoration(
-                          hintText: 'Status',
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.secondaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedStatus,
+                            style: const TextStyle(color: AppTheme.textColor),
+                            icon: const Icon(Icons.arrow_drop_down,
+                                color: AppTheme.subtleTextColor),
+                            items: [
+                              const DropdownMenuItem(
+                                value: null,
+                                child: Text('All Status'),
+                              ),
+                              ...['Present', 'Detected'].map((status) {
+                                return DropdownMenuItem(
+                                  value: status,
+                                  child: Text(status),
+                                );
+                              }),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedStatus = value;
+                                _filterRecords();
+                              });
+                            },
                           ),
                         ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: null,
-                            child: Text('All Status'),
-                          ),
-                          ...['Present', 'Detected'].map((status) {
-                            return DropdownMenuItem(
-                              value: status,
-                              child: Text(status),
-                            );
-                          }),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedStatus = value;
-                            _filterRecords();
-                          });
-                        },
                       ),
                     ),
                     const SizedBox(width: 12),

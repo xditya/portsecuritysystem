@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:portsecuritysystem/config/theme.dart';
 
 class AddFaceScreen extends StatefulWidget {
   const AddFaceScreen({super.key});
@@ -31,7 +32,9 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
     if (!_formKey.currentState!.validate() || _imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Please fill all fields and add an image')),
+          content: Text('Please fill all fields and add an image'),
+          backgroundColor: AppTheme.errorColor,
+        ),
       );
       return;
     }
@@ -57,7 +60,10 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
         if (!mounted) return;
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Face added successfully')),
+          const SnackBar(
+            content: Text('Face added successfully'),
+            backgroundColor: AppTheme.successColor,
+          ),
         );
       } else {
         throw 'Failed to add face';
@@ -65,7 +71,10 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: AppTheme.errorColor,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -83,7 +92,6 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Face'),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -97,22 +105,34 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
                 child: Container(
                   height: 200,
                   decoration: BoxDecoration(
-                    color: Colors.grey[850],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    color: AppTheme.secondaryColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withOpacity(0.2),
+                      width: 2,
+                    ),
                   ),
                   child: _imageFile == null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.camera_alt,
-                                size: 50, color: Colors.blue),
-                            SizedBox(height: 8),
-                            Text('Tap to take a photo'),
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              size: 48,
+                              color: AppTheme.primaryColor.withOpacity(0.5),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Tap to take a photo',
+                              style: TextStyle(
+                                color: AppTheme.subtleTextColor,
+                                fontSize: 16,
+                              ),
+                            ),
                           ],
                         )
                       : ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                           child: Image.file(
                             _imageFile!,
                             fit: BoxFit.cover,
@@ -125,7 +145,6 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: 'Name',
-                  border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
                 validator: (value) {
@@ -138,18 +157,16 @@ class _AddFaceScreenState extends State<AddFaceScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _isLoading ? null : _submitForm,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
                 child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text(
-                        'Submit',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Add Face'),
               ),
             ],
           ),
