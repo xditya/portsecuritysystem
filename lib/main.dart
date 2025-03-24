@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.darkTheme,
       onGenerateRoute: Routes.router.generator,
       initialRoute: '/',
+      debugShowCheckedModeBanner: false,
     );
   }
 }
